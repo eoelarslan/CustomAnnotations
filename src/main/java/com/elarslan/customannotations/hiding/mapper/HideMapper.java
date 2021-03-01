@@ -1,16 +1,18 @@
 package com.elarslan.customannotations.hiding.mapper;
 
 import com.elarslan.customannotations.dto.Perseverance;
+import com.elarslan.customannotations.enums.HidingData;
 import com.elarslan.customannotations.enums.HidingLevel;
-import com.elarslan.customannotations.hiding.annotations.HideLevelOne;
+import com.elarslan.customannotations.hiding.annotations.HideFromBelow;
+import com.elarslan.customannotations.hiding.annotations.HideLevel;
 import com.github.dozermapper.core.DozerBeanMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 
 @Component
 public class HideMapper {
@@ -23,12 +25,13 @@ public class HideMapper {
     }
 
     @Transactional
-    public <T> T map(Object o, Class<T> tClass, HidingLevel hidingLevel) {
+    public <T> T map(Object o, Class<T> tClass, HidingLevel hidingLevel) throws IllegalAccessException {
         T response = dozerBeanMapper.map(o, tClass);
         hideFields(response);
+        return response;
     }
 
-    private void hideFields(Object response) {
+    private void hideFields(Object response) throws IllegalAccessException {
         response = findCoreClassName(response);
         String className = findClassNameAsString(response);
 
@@ -69,12 +72,14 @@ public class HideMapper {
         if(fieldContent.isBlank()) {
             return;
         }
-        HideLevelOne hidingAnnotation = field.getAnnotation(HideLevelOne.class);
-        //String hideLevel = hidingAnnotation.hide().name(); // for logging
-        field.set(response,maskFieldWithHidingLevel(hidingAnnotation.hide(), fieldContent));
+        HideLevel hidingClassificationAnnotation = field.getAnnotation(HideLevel.class);
+        HideFromBelow hidingDataAnnotation = field.getAnnotation(HideFromBelow.class);
+        //String hideLevel = hidingClassificationAnnotation.hide().name(); // for logging
+        // same loggging for the second annotation
+        field.set(response,maskFieldWithHidingLevel(hidingClassificationAnnotation.hide(), hidingDataAnnotation.hideData(), fieldContent));
     }
 
-    private String maskFieldWithHidingLevel(HidingLevel hidingLevel, String data) {
+    private String maskFieldWithHidingLevel(HidingLevel hidingLevel, HidingData hidingData, String data) {
         // TODO: 27.02.2021 masking command will be executed (OnurE)
         return "";
     }

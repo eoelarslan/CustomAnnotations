@@ -8,14 +8,13 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class TechnicalEmployee extends Employee{
-    private List<String> accessibleSoftwares;
+    private List<String> accessibleSources;
 
-    public TechnicalEmployee(String name, Integer id, List<String> accessibleSoftwares){
+    public TechnicalEmployee(String name, Integer id, List<String> accessibleSources){
         super(name, id);
-        this.accessibleSoftwares = new ArrayList<>(accessibleSoftwares);
+        this.accessibleSources = new ArrayList<>(accessibleSources);
     }
 }

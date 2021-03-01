@@ -1,29 +1,35 @@
 package com.elarslan.customannotations.dto;
 
+import com.elarslan.customannotations.enums.HidingData;
 import com.elarslan.customannotations.enums.HidingLevel;
-import com.elarslan.customannotations.hiding.annotations.HideLevelOne;
+import com.elarslan.customannotations.hiding.annotations.HideFromBelow;
+import com.elarslan.customannotations.hiding.annotations.HideLevel;
 import lombok.*;
 
 @Getter
 @Setter
 @ToString
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class SpaceRover {
 
-    @HideLevelOne(hide = HidingLevel.LEVEL_ONE)
+    @HideLevel(hide = HidingLevel.LEVEL_ONE)
+    @HideFromBelow(hideData = HidingData.BARE)
     private String name;
 
-    @HideLevelOne(hide = HidingLevel.LEVEL_TWO)
+    @HideLevel(hide = HidingLevel.LEVEL_TWO)
+    @HideFromBelow(hideData = HidingData.SIMPLE)
     private String alias;
 
-    @HideLevelOne(hide = HidingLevel.LEVEL_ONE)
+    @HideLevel(hide = HidingLevel.LEVEL_ONE)
+    @HideFromBelow(hideData = HidingData.BARE)
     private String type;
 
-    @HideLevelOne(hide = HidingLevel.LEVEL_THREE)
+    @HideLevel(hide = HidingLevel.LEVEL_THREE)
+    @HideFromBelow(hideData = HidingData.SPECIFIC)
     private String manufacturer;
 
-    @HideLevelOne(hide = HidingLevel.LEVEL_FOUR)
+    @HideLevel(hide = HidingLevel.LEVEL_FOUR)
+    @HideFromBelow(hideData = HidingData.SPECIFIC)
     private String power;//Unit is Watt
 }

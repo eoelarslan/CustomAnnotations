@@ -10,10 +10,10 @@ import java.util.List;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class TechnicalEmployee extends Employee{
+public class TechnicalEmployee extends Employee {
     private List<String> accessibleSources;
 
-    public TechnicalEmployee(String name, Integer id, List<String> accessibleSources){
+    public TechnicalEmployee(String name, Integer id, List<String> accessibleSources) {
         super(name, id);
         this.accessibleSources = new ArrayList<>(accessibleSources);
     }

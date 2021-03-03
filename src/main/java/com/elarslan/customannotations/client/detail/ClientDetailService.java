@@ -9,14 +9,14 @@ import java.util.Arrays;
 
 @Service
 @Transactional
-public class ClientDetailService implements ClientDetail{
+public class ClientDetailService implements ClientDetail {
 
     @Override
     public <T extends Employee> T getClientDetail(Integer clientUniqueId, Class<T> type) {
         //TODO Proper service will be implemented (OnurE)
         //Dummy Data
         TechnicalEmployee technicalEmployee = new TechnicalEmployee("Adam Steltzner", 1963, Arrays.asList("IntelliJ", "Python", "Terraform"));
-        return  type.cast(technicalEmployee);
+        return type.cast(technicalEmployee);
     }
 
     @Override

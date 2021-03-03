@@ -1,6 +1,7 @@
 package com.elarslan.customannotations.enums;
 
 /**
+ * Non-masked values can be accessible with following orders
  * LEVEL_ONE: Can be accessed by anyone
  * LEVEL_TWO: Can be accessed by tech lead of any project
  * LEVEL_THREE: Can be accessed by chief engineer of any project

@@ -1,12 +1,15 @@
 package com.elarslan.customannotations.hiding.mapper;
 
+import com.elarslan.customannotations.client.detail.EmployeeDetailService;
 import com.elarslan.customannotations.designpattern.strategy.HidingStrategy;
 import com.elarslan.customannotations.dto.Perseverance;
 import com.elarslan.customannotations.enums.HidingData;
 import com.elarslan.customannotations.enums.HidingLevel;
+import com.elarslan.customannotations.exception.InvalidDataException;
 import com.elarslan.customannotations.hiding.annotations.HideFromBelow;
 import com.elarslan.customannotations.hiding.annotations.HideLevel;
 import com.github.dozermapper.core.DozerBeanMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -14,29 +17,31 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 
+@Slf4j
 @Component
 public class HideMapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(HideMapper.class);
 
     private final DozerBeanMapper dozerBeanMapper;
     private final HidingStrategy hidingStrategy;
+    private final EmployeeDetailService employeeDetailService;
 
-    public HideMapper(DozerBeanMapper dozerBeanMapper, HidingStrategy hidingStrategy) {
+    public HideMapper(DozerBeanMapper dozerBeanMapper, HidingStrategy hidingStrategy, EmployeeDetailService employeeDetailService) {
         this.dozerBeanMapper = dozerBeanMapper;
         this.hidingStrategy = hidingStrategy;
+        this.employeeDetailService = employeeDetailService;
     }
 
     @Transactional
-    public <T> T map(Object o, Class<T> tClass, HidingLevel hidingLevel) throws IllegalAccessException {
+    public <T> T map(Object o, Class<T> tClass) throws IllegalAccessException, InvalidDataException {
         T response = dozerBeanMapper.map(o, tClass);
         hideFields(response);
         return response;
     }
 
-    private void hideFields(Object response) throws IllegalAccessException {
+    private void hideFields(Object response) throws IllegalAccessException, InvalidDataException {
         response = findCoreClassName(response);
         String className = findClassNameAsString(response);
-
         Field[] fields = response.getClass().getDeclaredFields();
 
         for (Field field : fields) {
@@ -67,7 +72,7 @@ public class HideMapper {
         return response.getClass().getName();
     }
 
-    private void maskFields(Field field, Object response) throws IllegalAccessException {
+    private void maskFields(Field field, Object response) throws IllegalAccessException, InvalidDataException {
         String fieldContent = (String) field.get(response);
         if (fieldContent.isBlank()) {
             return;
@@ -79,7 +84,7 @@ public class HideMapper {
         field.set(response, maskFieldWithHidingLevel(hidingClassificationAnnotation.hide(), hidingDataAnnotation.hideData(), fieldContent));
     }
 
-    private String maskFieldWithHidingLevel(HidingLevel hidingLevel, HidingData hidingData, String data) {
+    private String maskFieldWithHidingLevel(HidingLevel hidingLevel, HidingData hidingData, String data) throws InvalidDataException {
         return hidingStrategy.executeCommand(hidingLevel, hidingData, data);
     }
 }

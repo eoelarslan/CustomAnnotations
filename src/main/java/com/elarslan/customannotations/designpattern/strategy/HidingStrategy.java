@@ -1,9 +1,13 @@
 package com.elarslan.customannotations.designpattern.strategy;
 
+import com.elarslan.customannotations.client.detail.EmployeeDetailService;
+import com.elarslan.customannotations.client.dto.TechnicalEmployee;
+import com.elarslan.customannotations.client.privilege.service.PrivilegeService;
 import com.elarslan.customannotations.designpattern.command.HidingCommand;
 import com.elarslan.customannotations.enums.HidingData;
 import com.elarslan.customannotations.enums.HidingLevel;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.elarslan.customannotations.exception.InvalidDataException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,13 +15,22 @@ import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Component
 @Transactional
 public class HidingStrategy implements StrategyPattern<HidingCommand> {
     private final Map<String, HidingCommand> hidingCommandMap = new HashMap<>();
 
-    @Autowired
-    private HidingStrategyService hidingStrategyService;
+
+    private final HidingStrategyService hidingStrategyService;
+    private final PrivilegeService privilegeService;
+    private final EmployeeDetailService employeeDetailService;
+
+    public HidingStrategy(HidingStrategyService hidingStrategyService, PrivilegeService privilegeService, EmployeeDetailService employeeDetailService) {
+        this.hidingStrategyService = hidingStrategyService;
+        this.privilegeService = privilegeService;
+        this.employeeDetailService = employeeDetailService;
+    }
 
     @PostConstruct
     public void init() {
@@ -32,13 +45,20 @@ public class HidingStrategy implements StrategyPattern<HidingCommand> {
         hidingCommandMap.put(commandName, command);
     }
 
-    public String executeCommand(HidingLevel hidingLevel, HidingData hidingData, String data) {
+    public String executeCommand(HidingLevel hidingLevel, HidingData hidingData, String data) throws InvalidDataException {
         String hidingLevelName = hidingLevel.name();
         String hidingDataName = hidingData.name();
         if(data.isBlank()) {
             //TODO Needs work for logging and proper return data. (OnurE)
             return ""; // nothing to mask!!!
         }
-        return "";
+        Integer hidingLevelValue = hidingLevel.level();
+        TechnicalEmployee technicalEmployee = employeeDetailService.getEmployeeDetail(1, TechnicalEmployee.class);
+
+        if (privilegeService.isDataVisible(hidingLevelValue, technicalEmployee.getLevel())) {
+            return data;
+        }
+        //If employee has lower level, than visibilityLogic must executed.
+        return hidingCommandMap.get(hidingLevelName).execute(data);
     }
 }

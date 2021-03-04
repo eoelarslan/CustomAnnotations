@@ -10,4 +10,5 @@ import lombok.*;
 public class Employee {
     private String name;
     private Integer id;
+    private Integer level;
 }

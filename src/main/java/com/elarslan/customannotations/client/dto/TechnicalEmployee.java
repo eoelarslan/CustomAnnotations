@@ -13,8 +13,8 @@ import java.util.List;
 public class TechnicalEmployee extends Employee {
     private List<String> accessibleSources;
 
-    public TechnicalEmployee(String name, Integer id, List<String> accessibleSources) {
-        super(name, id);
+    public TechnicalEmployee(String name, Integer id, Integer level, List<String> accessibleSources) {
+        super(name, id, level);
         this.accessibleSources = new ArrayList<>(accessibleSources);
     }
 }

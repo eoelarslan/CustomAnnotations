@@ -34,10 +34,10 @@ public class HidingStrategy implements StrategyPattern<HidingCommand> {
 
     @PostConstruct
     public void init() {
-        addCommand(HidingLevel.LEVEL_ONE.name(), hidingStrategyService::maskForExceptionalData);
-        addCommand(HidingLevel.LEVEL_TWO.name(), hidingStrategyService::maskForExceptionalData);
-        addCommand(HidingLevel.LEVEL_THREE.name(), hidingStrategyService::maskForSpecificData);
-        addCommand(HidingLevel.LEVEL_FOUR.name(), hidingStrategyService::maskForSimpleData);
+        addCommand(HidingData.BARE.name(), hidingStrategyService::maskForExceptionalData);
+        addCommand(HidingData.SIMPLE.name(), hidingStrategyService::maskForExceptionalData);
+        addCommand(HidingData.SPECIFIC.name(), hidingStrategyService::maskForSpecificData);
+        addCommand(HidingData.EXCEPTIONAL.name(), hidingStrategyService::maskForSimpleData);
     }
 
     @Override
@@ -48,17 +48,25 @@ public class HidingStrategy implements StrategyPattern<HidingCommand> {
     public String executeCommand(HidingLevel hidingLevel, HidingData hidingData, String data) throws InvalidDataException {
         String hidingLevelName = hidingLevel.name();
         String hidingDataName = hidingData.name();
-        if(data.isBlank()) {
+        if (data.isBlank()) {
             //TODO Needs work for logging and proper return data. (OnurE)
             return ""; // nothing to mask!!!
         }
         Integer hidingLevelValue = hidingLevel.level();
         TechnicalEmployee technicalEmployee = employeeDetailService.getEmployeeDetail(1, TechnicalEmployee.class);
 
+        return maskData(data, hidingDataName, hidingLevelValue, technicalEmployee);
+    }
+
+    private String maskData(String data, String hidingDataName, Integer hidingLevelValue, TechnicalEmployee technicalEmployee) throws InvalidDataException {
         if (privilegeService.isDataVisible(hidingLevelValue, technicalEmployee.getLevel())) {
             return data;
         }
-        //If employee has lower level, than visibilityLogic must executed.
-        return hidingCommandMap.get(hidingLevelName).execute(data);
+        //If employee has lower level, than logic must be executed to mask data.
+        if (privilegeService.isLevelAccessible(hidingLevelValue, technicalEmployee.getLevel())) {
+            return hidingCommandMap.get(hidingDataName).execute(data);
+        } else {
+            return hidingStrategyService.maskForExceptionalData(data);
+        }
     }
 }

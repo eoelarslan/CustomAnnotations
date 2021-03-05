@@ -13,6 +13,8 @@ public final class EmployeeConstant {
     public static final String LEVEL_4 = "LEVEL4";
     public static final String secretMessage = "Dare mighty things";
 
+    public static final int ACCESSIBLE_LEVEL_DIFFERENCE = 1;
+
     /*ImmutableMap<Integer, String> immutableMap
             = ImmutableMap.of(1, "LEVEL1", 2, "LEVEL2");*/
 
